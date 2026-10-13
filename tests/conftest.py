@@ -54,9 +54,13 @@ def fake() -> FakeInput:
 
 @pytest.fixture
 def game(fake: FakeInput):
-    """一个已经初始化好、但还没开始玩的游戏实例。"""
+    """一个已经初始化好、但还没开始玩的游戏实例。
+
+    固定 fit_window=False：让窗口严格保持 1200x800，断言才不会因为
+    「跑测试的机器屏幕多大」而变化（窗口自适应的行为单独测，见 TestWindowFit）。
+    """
     pygame.init()
-    ai = AlienInvasion(event_source=fake)
+    ai = AlienInvasion(event_source=fake, fit_window=False)
     yield ai
     pygame.quit()
 

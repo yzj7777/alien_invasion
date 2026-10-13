@@ -31,16 +31,20 @@ from .ship import Ship
 class AlienInvasion:
     """管理游戏资源和行为的类。"""
 
-    def __init__(self, event_source=None, on_frame=None) -> None:
+    def __init__(self, event_source=None, on_frame=None, fit_window=True) -> None:
         """初始化游戏并创建游戏资源。
 
         参数（不传就是教材里的行为）：
             event_source: 可调用对象，返回事件列表；默认 pygame.event.get
             on_frame:     每绘制完一帧后被调用，参数是游戏实例本身
+            fit_window:   窗口比屏幕还大时自动缩小（见 _fit_window_to_display）
         """
         pygame.init()
         self.clock = pygame.time.Clock()
         self.settings = Settings()
+
+        if fit_window and self.settings.fit_to_display:
+            self._fit_window_to_display()
 
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height)
@@ -67,6 +71,32 @@ class AlienInvasion:
 
         # 创建 Play 按钮
         self.play_button = Button(self, "Play")
+
+    def _fit_window_to_display(self) -> None:
+        """窗口放不下时等比缩小，保证飞船和 Play 按钮都在屏幕内。
+
+        为什么需要它：教材固定用 1200x800。在 1280x800 的 MacBook、1366x768 的
+        老笔记本上，这个窗口比可用区域还高，底部（飞船所在的位置！）会被切掉，
+        玩家会以为「游戏坏了」。
+
+        实现要点：
+        * 用 pygame.display.Info() 读当前桌面分辨率；
+        * 只有在读到的分辨率合理（大于 0）且确实放不下时才缩；
+        * 等比缩放，顺便把坐标取整，避免出现半像素的 rect。
+        """
+        info = pygame.display.Info()
+        avail_w, avail_h = info.current_w, info.current_h
+        if avail_w <= 0 or avail_h <= 0:          # 读不到（无头环境）就不动
+            return
+
+        max_w = int(avail_w * self.settings.max_screen_ratio)
+        max_h = int(avail_h * self.settings.max_screen_ratio)
+        if self.settings.screen_width <= max_w and self.settings.screen_height <= max_h:
+            return                                # 放得下，保持教材的 1200x800
+
+        ratio = min(max_w / self.settings.screen_width, max_h / self.settings.screen_height)
+        self.settings.screen_width = max(640, int(self.settings.screen_width * ratio))
+        self.settings.screen_height = max(480, int(self.settings.screen_height * ratio))
 
     # ------------------------------------------------------------- 主循环
     def run_game(self) -> None:

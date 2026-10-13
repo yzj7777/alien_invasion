@@ -30,7 +30,7 @@
 | **一步一步的实现教程**（从零到完整游戏，含 3 个环境坑 + 与教材的 9 处差异） | [`docs/教程.md`](docs/教程.md) |
 | 游戏本体代码 | `src/alien_invasion/`（`game.py` 就是书里的 `alien_invasion.py`） |
 | 自动化测试（28 个，覆盖第 12～14 章） | `tests/` |
-| 浏览器实时预览（无显示器环境也能玩） | `uv run python tools/preview_server.py` |
+| 浏览器实时预览 / 直接在浏览器里玩（无显示器环境） | `uv run python tools/preview_server.py` 然后打开 `http://localhost:8000/` |
 | 自动驾驶录屏 / 生成教程插图 | `uv run python tools/record_demo.py` |
 
 ```bash

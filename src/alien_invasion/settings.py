@@ -26,6 +26,13 @@ class Settings:
         self.bg_color = (230, 230, 230)  # 浅灰，和图片背景色一致
         self.fps = 60                    # 主循环帧率（教材 12.3.2）
 
+        # 窗口自适应：教材固定 1200x800。但如果用户的屏幕比它小（13 寸笔记本、
+        # 1280x800 的老 MacBook、带缩放的外接屏……），窗口会超出屏幕，
+        # 结果就是「飞船和 Play 按钮在屏幕外面，根本没法玩」。
+        # 打开这个开关后，窗口会自动缩到屏幕的 max_screen_ratio 倍以内。
+        self.fit_to_display = True
+        self.max_screen_ratio = 0.9
+
         # --- 飞船设置 ---
         self.ship_limit = 3              # 允许损失 3 艘飞船（教材 13.6）
 

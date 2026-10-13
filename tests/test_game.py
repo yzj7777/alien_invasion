@@ -331,3 +331,65 @@ class TestAssets:
         assert isinstance(game.aliens.sprites()[0], Alien)
         assert len(game.sb.ships) == game.settings.ship_limit
         assert isinstance(game._fire_bullet() or game.bullets.sprites()[0], Bullet)
+
+
+# ============================================================ 窗口自适应
+class TestWindowFit:
+    """小屏幕上窗口放不下时的自动缩放（教材没有，但真实笔记本上很需要）。
+
+    1280x800 的 MacBook、1366x768 的老笔记本上，1200x800 的窗口比可用区域还高，
+    底部会被切掉——玩家看到的是「飞船和 Play 按钮不见了」，很容易以为游戏坏了。
+    """
+
+    def test_small_display_shrinks_window_but_keeps_everything_onscreen(self):
+        from alien_invasion import AlienInvasion
+
+        pygame.init()
+        game = AlienInvasion(event_source=lambda: [], fit_window=True)
+        try:
+            info = pygame.display.Info()
+            avail_w, avail_h = info.current_w, info.current_h
+            if avail_w > 0 and avail_h > 0:          # 无头环境读不到就跳过断言
+                assert game.settings.screen_width <= avail_w
+                assert game.settings.screen_height <= avail_h
+            w, h = game.screen.get_size()
+            # 关键元素必须都在屏幕内
+            assert 0 < game.ship.rect.bottom <= h
+            assert game.screen.get_rect().contains(game.play_button.rect)
+            assert len(game.aliens) > 0
+        finally:
+            pygame.quit()
+
+    def test_explicit_size_is_untouched_when_disabled(self):
+        from alien_invasion import AlienInvasion
+
+        pygame.init()
+        game = AlienInvasion(event_source=lambda: [], fit_window=False)
+        try:
+            assert game.screen.get_size() == (1200, 800)
+            assert len(game.aliens) == 88
+            assert game.ship.rect.bottom == 800
+        finally:
+            pygame.quit()
+
+    def test_fleet_still_centered_on_a_custom_screen(self):
+        """换分辨率之后，记分牌/按钮的位置也要跟着走（教材的定位都没写死坐标）。"""
+        from alien_invasion import AlienInvasion
+
+        pygame.init()
+        game = AlienInvasion(event_source=lambda: [], fit_window=False)
+        try:
+            game.settings.screen_width, game.settings.screen_height = 900, 650
+            game.screen = pygame.display.set_mode((900, 650))
+            game.ship.screen_rect = game.screen.get_rect()
+            game.play_button.__init__(game, "Play")      # 重新按新尺寸布局
+            game.sb.screen_rect = game.screen.get_rect()
+
+            game._start_game()
+            game.sb.prep_score()
+            game.sb.prep_high_score()
+            assert game.play_button.rect.center == game.screen.get_rect().center
+            assert game.sb.score_rect.right == game.screen.get_rect().right - 20
+            assert game.ship.rect.midbottom == game.screen.get_rect().midbottom
+        finally:
+            pygame.quit()

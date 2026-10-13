@@ -296,7 +296,7 @@ def capture_wide_bullet_debug(out_dir: Path) -> None:
         elif rec.frame > 60:
             game.quit()
 
-    game = AlienInvasion(event_source=lambda: [], on_frame=on_frame)
+    game = AlienInvasion(event_source=lambda: [], on_frame=on_frame, fit_window=False)
     no_frame_limit(game)
     game.run_game()
 
@@ -319,7 +319,7 @@ def main() -> None:
     )
     autopilot = Autopilot(rec)
 
-    game = AlienInvasion(event_source=autopilot.events, on_frame=autopilot)
+    game = AlienInvasion(event_source=autopilot.events, on_frame=autopilot, fit_window=False)
     no_frame_limit(game)
 
     # 安全网：帧数超上限就强制结束
