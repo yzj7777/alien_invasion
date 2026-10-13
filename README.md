@@ -20,6 +20,30 @@
 
 ---
 
+## 🚀 本项目已经实现完成（2026）
+
+这份 README 是**教材笔记**；它的「附录：项目最终完整代码」已经不再是纸上代码 ——
+项目里已经按下面的结构把游戏真正写出来、跑起来、测起来了：
+
+| 想看什么 | 去哪里 |
+| --- | --- |
+| **一步一步的实现教程**（从零到完整游戏，含 3 个环境坑 + 与教材的 9 处差异） | [`docs/教程.md`](docs/教程.md) |
+| 游戏本体代码 | `src/alien_invasion/`（`game.py` 就是书里的 `alien_invasion.py`） |
+| 自动化测试（28 个，覆盖第 12～14 章） | `tests/` |
+| 浏览器实时预览（无显示器环境也能玩） | `uv run python tools/preview_server.py` |
+| 自动驾驶录屏 / 生成教程插图 | `uv run python tools/record_demo.py` |
+
+```bash
+uv sync                # 建环境（Python 3.14 会自动使用 pygame-ce，见教程附录 A）
+uv run alien-invasion  # 开始游戏
+uv run pytest -q       # 跑测试
+```
+
+> ⚠️ 依赖说明：官方 `pygame` 尚无 Python 3.14 的 wheel，所以 `pyproject.toml` 里写成
+> `pygame`（<3.14）+ `pygame-ce`（>=3.14）的条件依赖。代码里 `import pygame` 不变。
+
+---
+
 ## 一、项目概览
 
 ### 1.1 游戏玩法说明（开发计划）

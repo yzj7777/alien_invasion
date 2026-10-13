@@ -8,3 +8,14 @@ wheels/
 
 # Virtual environments
 .venv
+
+# 测试 / 类型检查缓存
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# 练习 14.5 打开最高分持久化后会生成（属于运行产物，不入库）
+high_score.txt
+
+# 编辑器 / 系统
+.DS_Store

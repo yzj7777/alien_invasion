@@ -1,17 +1,44 @@
 [project]
 name = "alien-invasion"
 version = "0.1.0"
-description = "Add your description here"
+description = "《Python 编程从入门到实践》（第 3 版）项目 1：用 Pygame 写《外星人入侵》"
 readme = "README.md"
 authors = [
     { name = "dadou", email = "3231338962@qq.com" }
 ]
-requires-python = ">=3.14"
-dependencies = []
+# 教材第 12.2 节写的是「python -m pip install --user pygame」。
+# 这里用 uv 管理项目环境，并且放宽到 >=3.11：这样既能在本机 3.14 上跑，
+# 也能在只有 3.11 的环境（CI、容器、本项目的沙箱）里复现。
+requires-python = ">=3.11"
+dependencies = [
+    # ⚠️ 关键坑：官方 pygame 2.6.1 只发布到 cp313 的 wheel，
+    #    在 Python 3.14 上装会变成「现场编译源码」，大概率失败。
+    #    pygame-ce（Community Edition）是同一套 API 的社区维护版，已有 cp314 wheel。
+    #    所以：<3.14 用官方 pygame，>=3.14 自动换成 pygame-ce，
+    #    代码里 `import pygame` 完全不用改。
+    "pygame>=2.6.1; python_version < '3.14'",
+    "pygame-ce>=2.5.8; python_version >= '3.14'",
+]
 
 [project.scripts]
 alien-invasion = "alien_invasion:main"
 
+[dependency-groups]
+# 开发用依赖：测试 + 生成素材/录屏的工具（tools/ 里的脚本）
+dev = [
+    "pytest>=8.0",
+    "pillow>=10.0",
+]
+
 [build-system]
-requires = ["uv_build>=0.12.23,<0.13.0"]
+requires = ["uv_build>=0.12.23,<0.14.0"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "alien_invasion"
+module-root = "src"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# 沙箱/容器里常常没有 fc-list，pygame 会为此发一条 UserWarning，这里忽略掉即可
+filterwarnings = ["ignore:.*fc-list.*:UserWarning"]
